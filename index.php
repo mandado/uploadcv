@@ -17,13 +17,11 @@ if($_POST['enviar']){
     $upload->setBucket('cdv-testes');
     $upload->setKey($files['name']);
     $upload->setAcl('public-read');
-    $upload->setBody(new EntityBody($files['tmp_name']));
-    $upload->setOptions([
-        'ContentType' => 'image/jpeg'
-    ]);
+    $upload->setBody(file_get_contents($files['tmp_name']));
     $res = $upload->upload();
 }
 
+$client->clearBucket('cdv-testes');
 ?>
 
 <form action="" enctype="multipart/form-data" method="post">
