@@ -23,7 +23,7 @@ $arch = file_get_contents('testeuploadarquivo.txt');
 //var_dump($client->getObjectUrl('cdv-testes', 'textupload.txt'));
 
 $upload = new \CV\Upload();
-$upload->setAdapter(new \CV\UploadFileAdpater());
+$upload->setAdapter(new \CV\UploadS3Adpter($client));
 $upload->getAdapter()->setBucket('cdv-testes');
 $upload->getAdapter()->setName('cdv-testes.txt');
 $upload->getAdapter()->setFile($arch);
