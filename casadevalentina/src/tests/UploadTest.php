@@ -99,40 +99,52 @@ class UploadTest extends PHPUnit_Framework_TestCase{
 
 
     public function testShouldBeUploadSuccess(){
-        $file = m::mock('File');
+        $Mockedfile = m::mock('File');
+        $Mockedfile->shouldReceive('getContents')->once()->andReturn('Hello World');
+        $FileContents = $Mockedfile->getContents();
 
-        $file->shouldReceive('getContents')->once()->andReturn('Hello World');
-
-        $file1 = $file->getContents();
+        $MockedUpload = m::mock('\CV\Upload');
+        $MockedUpload->shouldReceive('upload')->once()->andReturn([
+            'ObjectURL' => 'https://cdv-testes.s3.amazonaws.com/text.txt'
+        ]);
 
         $upload = new \CV\Upload($this->s3);
         $upload->setBucket('cdv-testes');
         $upload->setKey('text.txt');
         $upload->setAcl('public-read');
-        $upload->setBody($file1);
-        $response = $upload->upload();
+        $upload->setBody($FileContents);
+        $response = $MockedUpload->upload();
         $this->assertNotEmpty($response);
     }
 
     public function testShouldBeUploadSuccessAndObjectURLValid(){
-        $file = m::mock('File');
+        $Mockedfile = m::mock('File');
+        $Mockedfile->shouldReceive('getContents')->once()->andReturn('Hello World');
+        $FileContents = $Mockedfile->getContents();
 
-        $file->shouldReceive('getContents')->once()->andReturn('Hello World');
-
-        $file1 = $file->getContents();
+        $MockedUpload = m::mock('\CV\Upload');
+        $MockedUpload->shouldReceive('upload')->once()->andReturn([
+            'ObjectURL' => 'https://cdv-testes.s3.amazonaws.com/text.txt'
+        ]);
 
         $upload = new \CV\Upload($this->s3);
         $upload->setBucket('cdv-testes');
         $upload->setKey('text.txt');
         $upload->setAcl('public-read');
-        $upload->setBody($file1);
-        $response = $upload->upload();
-        $this->assertEquals('https://cdv-testes.s3.amazonaws.com/text.txt',$response->get('ObjectURL'));
+        $upload->setBody($FileContents);
+        $response = $MockedUpload->upload();
+        $this->assertEquals('https://cdv-testes.s3.amazonaws.com/text.txt',$response['ObjectURL']);
+    }
+
+    public function testShouldBeOptionsIsArray(){
+        $upload = new \CV\Upload($this->s3);
+        $upload->setOptions([]);
+
+        $this->assertTrue(is_array($upload->getOptions()));
     }
 
     public function tearDown(){
         unset($this->s3);
         m::close();
-
     }
 }

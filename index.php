@@ -5,28 +5,35 @@ ini_set('display_errors',1);
 require 'vendor/autoload.php';
 
 use Aws\S3\S3Client;
-
+use Guzzle\Http\EntityBody;
 $client = S3Client::factory([
     'key' => 'AKIAJEMXF7D3TXQ25ZKA',
     'secret' => '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',
 ]);
-$arch = file_get_contents('testeuploadarquivo.txt');
-//$up = $client->upload('cdv-testes', 'textupload.txt', $arch, 'public-read');
-//var_dump($up);
-//$iterator = $client->getIterator('ListObjects', array(
-//    'Bucket' => 'cdv-testes'
-//));
+$res = null;
+if($_POST['enviar']){
+    $files = $_FILES['teste'];
+    $upload = new \CV\Upload($client);
+    $upload->setBucket('cdv-testes');
+    $upload->setKey($files['name']);
+    $upload->setAcl('public-read');
+    $upload->setBody(new EntityBody($files['tmp_name']));
+    $upload->setOptions([
+        'ContentType' => 'image/jpeg'
+    ]);
+    $res = $upload->upload();
+}
 
-//foreach ($iterator as $object) {
-//    echo $object['Key'] . "\n";
-//}
-//
-//var_dump($client->getObjectUrl('cdv-testes', 'textupload.txt'));
+?>
 
-$upload = new \CV\Upload($client);
-$upload->setBucket('cdv-testes');
-$upload->setKey('text.txt');
-$upload->setAcl('public-read');
-$upload->setBody($arch);
-$res = $upload->upload();
-var_dump($res->get('ObjectURL'));
+<form action="" enctype="multipart/form-data" method="post">
+    <input type="file" name="teste"/>
+    <input type="submit" name="enviar" value="ok"/>
+    <?php
+        if($res != null) {
+    ?>
+     <img src="<?=$res->get('ObjectURL') ?>" alt=""/>
+    <?php
+        }
+    ?>
+</form>

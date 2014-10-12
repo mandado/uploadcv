@@ -10,7 +10,7 @@ class Upload
     private $key;
     private $body;
     private $acl;
-
+    private $options = [];
     public function __construct(S3\S3Client $s3)
     {
         $this->s3Instance = $s3;
@@ -18,7 +18,7 @@ class Upload
 
     public function upload()
     {
-        return $this->getInstanceS3()->upload($this->getBucket(), $this->getKey(), $this->getBody(), $this->getAcl());
+        return $this->getInstanceS3()->upload($this->getBucket(), $this->getKey(), $this->getBody(), $this->getAcl(),$this->getOptions());
     }
 
     /**
@@ -35,7 +35,7 @@ class Upload
     public function setAcl($acl)
     {
         if ($acl === null || empty($acl)) {
-            throw new \InvalidArgumentException();
+            throw new \InvalidArgumentException("Act wouldn't null or empty");
         }
         $this->acl = $acl;
     }
@@ -54,7 +54,7 @@ class Upload
     public function setBody($body)
     {
         if ($body === null || empty($body)) {
-            throw new \InvalidArgumentException();
+            throw new \InvalidArgumentException("Body wouldn't null or empty");
         }
         $this->body = $body;
     }
@@ -73,7 +73,7 @@ class Upload
     public function setKey($key)
     {
         if ($key === null || empty($key)) {
-            throw new \InvalidArgumentException();
+            throw new \InvalidArgumentException("Key wouldn't null or empty");
         }
         $this->key = $key;
     }
@@ -106,5 +106,23 @@ class Upload
     {
         return $this->s3Instance;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    /**
+     * @param mixed $options
+     */
+    public function setOptions(Array $options)
+    {
+        $this->options = $options;
+    }
+
+
 
 }
