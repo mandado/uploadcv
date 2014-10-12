@@ -24,4 +24,9 @@ $arch = file_get_contents('testeuploadarquivo.txt');
 
 $upload = new \CV\Upload();
 $upload->setAdapter(new \CV\UploadFileAdpater());
+$upload->getAdapter()->setBucket('cdv-testes');
+$upload->getAdapter()->setName('cdv-testes.txt');
+$upload->getAdapter()->setFile($arch);
+$upload->getAdapter()->setAcl('public-read');
 $upload->upload();
+echo $upload->getAdapter()->getUrl();
