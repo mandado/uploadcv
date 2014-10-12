@@ -1,5 +1,6 @@
 <?php
 error_reporting(E_ALL);
+define('ROOT_DIR',__DIR__);
 ini_set('display_errors',1);
 require 'vendor/autoload.php';
 
@@ -22,11 +23,10 @@ $arch = file_get_contents('testeuploadarquivo.txt');
 //
 //var_dump($client->getObjectUrl('cdv-testes', 'textupload.txt'));
 
-$upload = new \CV\Upload();
-$upload->setAdapter(new \CV\UploadS3Adpter($client));
-$upload->getAdapter()->setBucket('cdv-testes');
-$upload->getAdapter()->setName('cdv-testes.txt');
-$upload->getAdapter()->setFile($arch);
-$upload->getAdapter()->setAcl('public-read');
-$upload->upload();
-echo $upload->getAdapter()->getUrl();
+$upload = new \CV\Upload($client);
+$upload->setBucket('cdv-testes');
+$upload->setKey('text.txt');
+$upload->setAcl('public-read');
+$upload->setBody($arch);
+$res = $upload->upload();
+var_dump($res->get('ObjectURL'));

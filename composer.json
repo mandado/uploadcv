@@ -1,6 +1,8 @@
 {
     "require": {
-        "aws/aws-sdk-php": "2.*"
+        "aws/aws-sdk-php": "2.*",
+        "phpunit/phpunit": "4.3.*",
+        "mockery/mockery": "dev-master"
     },
     "autoload": {
         "psr-4": {

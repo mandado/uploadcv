@@ -1,32 +1,110 @@
 <?php
 namespace CV;
 
-class Upload implements \CV\UploadInterface{
-    private $adapter;
+use Aws\S3;
 
-    public function upload(){
-        return $this->getAdapter()->upload();
+class Upload
+{
+    private $s3Instance;
+    private $bucket;
+    private $key;
+    private $body;
+    private $acl;
+
+    public function __construct(S3\S3Client $s3)
+    {
+        $this->s3Instance = $s3;
+    }
+
+    public function upload()
+    {
+        return $this->getInstanceS3()->upload($this->getBucket(), $this->getKey(), $this->getBody(), $this->getAcl());
     }
 
     /**
      * @return mixed
      */
-    public function getAdapter()
+    public function getAcl()
     {
-        return $this->adapter;
+        return $this->acl;
     }
 
     /**
-     * @param mixed $adapter
+     * @param mixed $acl
      */
-    public function setAdapter($adapter)
+    public function setAcl($acl)
     {
-        $this->adapter = $adapter;
+        if ($acl === null || empty($acl)) {
+            throw new \InvalidArgumentException();
+        }
+        $this->acl = $acl;
     }
 
-
-    public function setFile($file)
+    /**
+     * @return mixed
+     */
+    public function getBody()
     {
-        // TODO: Implement setFile() method.
+        return $this->body;
     }
+
+    /**
+     * @param mixed $body
+     */
+    public function setBody($body)
+    {
+        if ($body === null || empty($body)) {
+            throw new \InvalidArgumentException();
+        }
+        $this->body = $body;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getKey()
+    {
+        return $this->key;
+    }
+
+    /**
+     * @param mixed $key
+     */
+    public function setKey($key)
+    {
+        if ($key === null || empty($key)) {
+            throw new \InvalidArgumentException();
+        }
+        $this->key = $key;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getBucket()
+    {
+        return $this->bucket;
+    }
+
+    /**
+     * @param mixed $bucket
+     */
+    public function setBucket($bucket)
+    {
+        $isvalidBucket = $this->getInstanceS3()->isValidBucketName($bucket);
+
+        if ($bucket === null || empty($bucket)) {
+            throw new \InvalidArgumentException();
+        }
+        if ($isvalidBucket === false) {
+            throw new S3\Exception\InvalidBucketNameException();
+        }
+        $this->bucket = $bucket;
+    }
+
+    public function getInstanceS3()
+    {
+        return $this->s3Instance;
+    }
+
 }
