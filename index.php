@@ -5,7 +5,6 @@ ini_set('display_errors',1);
 require 'vendor/autoload.php';
 
 use Aws\S3\S3Client;
-use Guzzle\Http\EntityBody;
 $client = S3Client::factory([
     'key' => 'AKIAJEMXF7D3TXQ25ZKA',
     'secret' => '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',
@@ -14,14 +13,17 @@ $res = null;
 if($_POST['enviar']){
     $files = $_FILES['teste'];
     $upload = new \CV\Upload($client);
-    $upload->setBucket('cdv-testes');
-    $upload->setKey($files['name']);
-    $upload->setAcl('public-read');
-    $upload->setBody(file_get_contents($files['tmp_name']));
-    $res = $upload->upload();
+    $res = $upload->upload($files,'meudiretorio/');
 }
 
-$client->clearBucket('cdv-testes');
+$iterator = $client->getIterator('ListObjects', array(
+    'Bucket' => 'cdv-testes'
+));
+
+foreach ($iterator as $object) {
+    echo $object['Key'] . "\n";
+}
+
 ?>
 
 <form action="" enctype="multipart/form-data" method="post">

@@ -57,12 +57,16 @@ class UploadTest extends PHPUnit_Framework_TestCase{
         $upload->setKey(null);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testShouldBeKeyNotEmpty(){
+    public function testShouldBeHasKey(){
+        $upload = new \CV\Upload($this->s3);
+        $upload->setKey('filename.txt');
+        $this->assertTrue($upload->hasKey());
+    }
+
+    public function testShouldBeNotHasKey(){
         $upload = new \CV\Upload($this->s3);
         $upload->setKey('');
+        $this->assertFalse($upload->hasKey());
     }
 
     /**
@@ -98,6 +102,29 @@ class UploadTest extends PHPUnit_Framework_TestCase{
     }
 
 
+    public function testShouldBefilenameIsForced(){
+        $Mockedfile = m::mock('File');
+        $Mockedfile->shouldReceive('getContents')->once()->andReturn('Hello World');
+        $FileContents = $Mockedfile->getContents();
+
+        $MockedUpload = m::mock('\CV\Upload');
+        $MockedUpload->shouldReceive('upload')->once()->andReturn([
+            'ObjectURL' => 'https://cdv-testes.s3.amazonaws.com/text.txt'
+        ]);
+
+        //Simulando o $_FILES
+        $files = ['tmp_name'=>'/tmp/454.tmp','name'=>'text.txt'];
+
+        $upload = new \CV\Upload($this->s3);
+        $upload->setBucket('cdv-testes');
+        $upload->setKey('text.txt');
+        $upload->setAcl('public-read');
+        $upload->setBody($FileContents);
+        $response = $MockedUpload->upload($files);
+        $this->assertEquals('text.txt',$upload->getKey());
+    }
+
+
     public function testShouldBeUploadSuccess(){
         $Mockedfile = m::mock('File');
         $Mockedfile->shouldReceive('getContents')->once()->andReturn('Hello World');
@@ -108,12 +135,15 @@ class UploadTest extends PHPUnit_Framework_TestCase{
             'ObjectURL' => 'https://cdv-testes.s3.amazonaws.com/text.txt'
         ]);
 
+        //Simulando o $_FILES
+        $files = ['tmp_name'=>'/tmp/454.tmp','name'=>'text.txt'];
+
         $upload = new \CV\Upload($this->s3);
         $upload->setBucket('cdv-testes');
         $upload->setKey('text.txt');
         $upload->setAcl('public-read');
         $upload->setBody($FileContents);
-        $response = $MockedUpload->upload();
+        $response = $MockedUpload->upload($files);
         $this->assertNotEmpty($response);
     }
 
@@ -127,12 +157,15 @@ class UploadTest extends PHPUnit_Framework_TestCase{
             'ObjectURL' => 'https://cdv-testes.s3.amazonaws.com/text.txt'
         ]);
 
+        //Simulando o $_FILES
+        $files = ['tmp_name'=>'/tmp/454.tmp','name'=>'text.txt'];
+
         $upload = new \CV\Upload($this->s3);
         $upload->setBucket('cdv-testes');
         $upload->setKey('text.txt');
         $upload->setAcl('public-read');
         $upload->setBody($FileContents);
-        $response = $MockedUpload->upload();
+        $response = $MockedUpload->upload($files);
         $this->assertEquals('https://cdv-testes.s3.amazonaws.com/text.txt',$response['ObjectURL']);
     }
 

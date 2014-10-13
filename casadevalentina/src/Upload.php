@@ -11,14 +11,23 @@ class Upload
     private $body;
     private $acl;
     private $options = [];
+    private $file;
     public function __construct(S3\S3Client $s3)
     {
         $this->s3Instance = $s3;
+        $this->setBucket('cdv-testes');
+        $this->setAcl('public-read');
     }
 
-    public function upload()
+    public function upload($files,$diretorio = null)
     {
-        return $this->getInstanceS3()->upload($this->getBucket(), $this->getKey(), $this->getBody(), $this->getAcl(),$this->getOptions());
+        $this->setFile($files);
+        $this->setBody(file_get_contents($this->getFile('tmp_name')));
+        $name = ($this->hasKey()) ? $this->getKey() : $this->getFile('name');
+        if(!is_null($diretorio)){
+            return $this->getInstanceS3()->upload($this->getBucket(), $diretorio.'/'.$name, $this->getBody(), $this->getAcl(),$this->getOptions());
+        }
+        return $this->getInstanceS3()->upload($this->getBucket(), $name, $this->getBody(), $this->getAcl(),$this->getOptions());
     }
 
     /**
@@ -64,7 +73,7 @@ class Upload
      */
     public function getKey()
     {
-        return $this->key;
+         return $this->key;
     }
 
     /**
@@ -72,10 +81,15 @@ class Upload
      */
     public function setKey($key)
     {
-        if ($key === null || empty($key)) {
-            throw new \InvalidArgumentException("Key wouldn't null or empty");
+        if ($key === null) {
+            throw new \InvalidArgumentException("Key wouldn't null");
         }
         $this->key = $key;
+    }
+
+    public function hasKey(){
+        $name = $this->getKey();
+        return !empty($name);
     }
 
     /**
@@ -123,6 +137,21 @@ class Upload
         $this->options = $options;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getFile($name)
+    {
+        return $this->file[$name];
+    }
+
+    /**
+     * @param mixed $file
+     */
+    public function setFile($file)
+    {
+        $this->file = $file;
+    }
 
 
 }
