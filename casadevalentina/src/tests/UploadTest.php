@@ -13,8 +13,8 @@ class UploadTest extends PHPUnit_Framework_TestCase{
 
     public function setUp(){
         $this->s3 = S3\S3Client::factory([
-            'key' => 'AKIAJEMXF7D3TXQ25ZKA',
-            'secret' => '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',
+            'key' => 'key',
+            'secret' => 'secret',
         ]);
     }
 
